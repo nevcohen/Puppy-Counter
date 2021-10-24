@@ -99,6 +99,28 @@ class MainActivity : AppCompatActivity() {
     super.onDestroy()
   }
 
+  // Saving Instance State
+  override fun onSaveInstanceState(outState: Bundle) {
+    Timber.i("PuppyCounter - MainActivity - onSaveInstanceState()")
+
+    // Save the dog count state
+    outState.putParcelable(STATE_DOG_COUNT, dogCount)
+
+    // Always call the superclass so it can save the view hierarchy state
+    super.onSaveInstanceState(outState)
+  }
+
+  // Restoring Instance State
+  override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+    Timber.i("PuppyCounter - MainActivity - onRestoreInstanceState()")
+
+    // Always call the superclass so it can restore the view hierarchy
+    super.onRestoreInstanceState(savedInstanceState)
+
+    dogCount = savedInstanceState.getParcelable(STATE_DOG_COUNT) ?: DogCount()
+  }
+
+
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
     val inflater: MenuInflater = menuInflater
     inflater.inflate(R.menu.menu_activity_main, menu)
