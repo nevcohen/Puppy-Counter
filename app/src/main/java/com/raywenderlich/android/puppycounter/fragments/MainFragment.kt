@@ -11,6 +11,9 @@ import androidx.fragment.app.Fragment
 import com.raywenderlich.android.puppycounter.R
 import com.raywenderlich.android.puppycounter.model.DogCount
 import timber.log.Timber
+import androidx.fragment.app.viewModels
+import com.raywenderlich.android.puppycounter.fragments.viewmodels.MainViewModel
+
 
 /*
  * Copyright (c) 2021 Razeware LLC
@@ -55,151 +58,140 @@ private const val STATE_DOG_COUNT = "state_dog_count"
 
 class MainFragment : Fragment() {
 
-  companion object {
+    companion object {
 
-    const val TAG = "MainFragment"
-  }
-
-  private var dogCount: DogCount = DogCount()
-
-  private lateinit var smallDogCountLabel: TextView
-  private lateinit var middleDogCountLabel: TextView
-  private lateinit var bigDogCountLabel: TextView
-
-  override fun onCreate(savedInstanceState: Bundle?) {
-    Timber.i("PuppyCounter - MainFragment - onCreate()")
-    super.onCreate(savedInstanceState)
-
-    savedInstanceState?.run {
-      Timber.i("PuppyCounter - MainFragment - restoreState()")
-      val savedDogCount: DogCount? = getParcelable(STATE_DOG_COUNT)
-      dogCount = savedDogCount ?: DogCount()
-    }
-  }
-
-  override fun onCreateView(
-      inflater: LayoutInflater,
-      container: ViewGroup?,
-      savedInstanceState: Bundle?
-  ): View? {
-    Timber.i("PuppyCounter - MainFragment - onCreateView()")
-    return inflater.inflate(R.layout.layout_main, container, false)
-  }
-
-  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    Timber.i("PuppyCounter - MainFragment - onViewCreated()")
-    super.onViewCreated(view, savedInstanceState)
-    findViews(view)
-    setupSmallDogViewsClickListeners(view)
-    setupMiddleDogViewsClickListeners(view)
-    setupBigDogViewsClickListeners(view)
-  }
-
-  override fun onStart() {
-    Timber.i("PuppyCounter - MainFragment - onStart()")
-    super.onStart()
-  }
-
-  override fun onResume() {
-    Timber.i("PuppyCounter - MainFragment - onResume()")
-    super.onResume()
-    renderDogCount(dogCount)
-  }
-
-  override fun onPause() {
-    Timber.i("PuppyCounter - MainFragment - onPause()")
-    super.onPause()
-  }
-
-  override fun onStop() {
-    Timber.i("PuppyCounter - MainFragment - onStop()")
-    super.onStop()
-  }
-
-  override fun onDestroyView() {
-    Timber.i("PuppyCounter - MainFragment - onDestroyView()")
-    super.onDestroyView()
-  }
-
-  override fun onDestroy() {
-    Timber.i("PuppyCounter - MainFragment - onDestroy()")
-    super.onDestroy()
-  }
-
-  override fun onSaveInstanceState(outState: Bundle) {
-    Timber.i("PuppyCounter - MainFragment - onSaveInstanceState()")
-
-    // Save the dog count state
-    outState.run {
-      putParcelable(STATE_DOG_COUNT, dogCount)
+        const val TAG = "MainFragment"
     }
 
-    // Always call the superclass so it can save the view hierarchy state
-    super.onSaveInstanceState(outState)
-  }
+    private var dogCount: DogCount = DogCount()
 
-  private fun findViews(view: View) {
-    smallDogCountLabel = view.findViewById(R.id.smallDogCountLabel)
-    middleDogCountLabel = view.findViewById(R.id.middleDogCountLabel)
-    bigDogCountLabel = view.findViewById(R.id.bigDogCountLabel)
-  }
+    private lateinit var smallDogCountLabel: TextView
+    private lateinit var middleDogCountLabel: TextView
+    private lateinit var bigDogCountLabel: TextView
+    private val viewModel: MainViewModel by viewModels()
 
-  private fun setupSmallDogViewsClickListeners(view: View) {
-    view.apply {
-      findViewById<CardView>(R.id.smallDog).setOnClickListener {
-        updateDogCount(dogCount.incrementSmallDogCount())
-      }
-      findViewById<ImageView>(R.id.smallDogMinusBtn).setOnClickListener {
-        updateDogCount(dogCount.decrementSmallDogCount())
-      }
-      findViewById<ImageView>(R.id.smallDogPlusBtn).setOnClickListener {
-        updateDogCount(dogCount.incrementSmallDogCount())
-      }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        Timber.i("PuppyCounter - MainFragment - onCreate()")
+        super.onCreate(savedInstanceState)
     }
-  }
 
-  private fun setupMiddleDogViewsClickListeners(view: View) {
-    view.apply {
-      findViewById<CardView>(R.id.middleDog).setOnClickListener {
-        updateDogCount(dogCount.incrementMiddleDogCount())
-      }
-      findViewById<ImageView>(R.id.middleDogMinusBtn).setOnClickListener {
-        updateDogCount(dogCount.decrementMiddleDogCount())
-      }
-      findViewById<ImageView>(R.id.middleDogPlusBtn).setOnClickListener {
-        updateDogCount(dogCount.incrementMiddleDogCount())
-      }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        Timber.i("PuppyCounter - MainFragment - onCreateView()")
+        return inflater.inflate(R.layout.layout_main, container, false)
     }
-  }
 
-  private fun setupBigDogViewsClickListeners(view: View) {
-    view.apply {
-      findViewById<CardView>(R.id.bigDog).setOnClickListener {
-        updateDogCount(dogCount.incrementBigDogCount())
-      }
-      findViewById<ImageView>(R.id.bigDogMinusBtn).setOnClickListener {
-        updateDogCount(dogCount.decrementBigDogCount())
-      }
-      findViewById<ImageView>(R.id.bigDogPlusBtn).setOnClickListener {
-        updateDogCount(dogCount.incrementBigDogCount())
-      }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        Timber.i("PuppyCounter - MainFragment - onViewCreated()")
+        super.onViewCreated(view, savedInstanceState)
+        subscribeToViewModel()
+        findViews(view)
+        setupSmallDogViewsClickListeners(view)
+        setupMiddleDogViewsClickListeners(view)
+        setupBigDogViewsClickListeners(view)
     }
-  }
 
-  private fun updateDogCount(newDogCount: DogCount) {
-    dogCount = newDogCount
-    renderDogCount(dogCount)
-  }
+    override fun onStart() {
+        Timber.i("PuppyCounter - MainFragment - onStart()")
+        super.onStart()
+    }
 
-  private fun renderDogCount(dogCount: DogCount) = with(dogCount) {
-    smallDogCountLabel.text = smallDogCount.toString()
-    middleDogCountLabel.text = middleDogCount.toString()
-    bigDogCountLabel.text = bigDogCount.toString()
-  }
+    override fun onResume() {
+        Timber.i("PuppyCounter - MainFragment - onResume()")
+        super.onResume()
+    }
 
-  fun getDogCount(): DogCount = dogCount
+    override fun onPause() {
+        Timber.i("PuppyCounter - MainFragment - onPause()")
+        super.onPause()
+    }
 
-  fun clearAllCounts() {
-    updateDogCount(DogCount())
-  }
+    override fun onStop() {
+        Timber.i("PuppyCounter - MainFragment - onStop()")
+        super.onStop()
+    }
+
+    override fun onDestroyView() {
+        Timber.i("PuppyCounter - MainFragment - onDestroyView()")
+        super.onDestroyView()
+    }
+
+    override fun onDestroy() {
+        Timber.i("PuppyCounter - MainFragment - onDestroy()")
+        super.onDestroy()
+    }
+
+    private fun findViews(view: View) {
+        smallDogCountLabel = view.findViewById(R.id.smallDogCountLabel)
+        middleDogCountLabel = view.findViewById(R.id.middleDogCountLabel)
+        bigDogCountLabel = view.findViewById(R.id.bigDogCountLabel)
+    }
+
+    private fun setupSmallDogViewsClickListeners(view: View) {
+        view.apply {
+            findViewById<CardView>(R.id.smallDog).setOnClickListener {
+                updateDogCount(dogCount.incrementSmallDogCount())
+            }
+            findViewById<ImageView>(R.id.smallDogMinusBtn).setOnClickListener {
+                updateDogCount(dogCount.decrementSmallDogCount())
+            }
+            findViewById<ImageView>(R.id.smallDogPlusBtn).setOnClickListener {
+                updateDogCount(dogCount.incrementSmallDogCount())
+            }
+        }
+    }
+
+    private fun setupMiddleDogViewsClickListeners(view: View) {
+        view.apply {
+            findViewById<CardView>(R.id.middleDog).setOnClickListener {
+                updateDogCount(dogCount.incrementMiddleDogCount())
+            }
+            findViewById<ImageView>(R.id.middleDogMinusBtn).setOnClickListener {
+                updateDogCount(dogCount.decrementMiddleDogCount())
+            }
+            findViewById<ImageView>(R.id.middleDogPlusBtn).setOnClickListener {
+                updateDogCount(dogCount.incrementMiddleDogCount())
+            }
+        }
+    }
+
+    private fun setupBigDogViewsClickListeners(view: View) {
+        view.apply {
+            findViewById<CardView>(R.id.bigDog).setOnClickListener {
+                updateDogCount(dogCount.incrementBigDogCount())
+            }
+            findViewById<ImageView>(R.id.bigDogMinusBtn).setOnClickListener {
+                updateDogCount(dogCount.decrementBigDogCount())
+            }
+            findViewById<ImageView>(R.id.bigDogPlusBtn).setOnClickListener {
+                updateDogCount(dogCount.incrementBigDogCount())
+            }
+        }
+    }
+
+    private fun updateDogCount(newDogCount: DogCount) {
+        viewModel.setDogCount(newDogCount)
+    }
+
+    private fun renderDogCount(dogCount: DogCount) = with(dogCount) {
+        smallDogCountLabel.text = smallDogCount.toString()
+        middleDogCountLabel.text = middleDogCount.toString()
+        bigDogCountLabel.text = bigDogCount.toString()
+    }
+
+    private fun subscribeToViewModel() {
+        viewModel.dogCount.observe(viewLifecycleOwner, { value ->
+            dogCount = value
+            renderDogCount(dogCount)
+        })
+    }
+
+    fun getDogCount(): DogCount = dogCount
+
+    fun clearAllCounts() {
+        updateDogCount(DogCount())
+    }
 }
