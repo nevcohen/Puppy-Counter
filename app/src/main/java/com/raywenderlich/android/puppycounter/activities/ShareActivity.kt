@@ -53,82 +53,91 @@ import timber.log.Timber
 
 class ShareActivity : AppCompatActivity() {
 
-  companion object {
+    companion object {
 
-    const val EXTRA_DOG_COUNT = "extra_dog_count"
+        const val EXTRA_DOG_COUNT = "extra_dog_count"
 
-    fun createIntent(context: Context) = Intent(context, ShareActivity::class.java)
-  }
-
-  private lateinit var smallDogStatsLabel: TextView
-  private lateinit var middleDogStatsLabel: TextView
-  private lateinit var bigDogStatsLabel: TextView
-
-  private var dogCount: DogCount = DogCount()
-
-  override fun onStart() {
-    Timber.i("PuppyCounter - ShareActivity - onStart()")
-    super.onStart()
-  }
-
-  override fun onCreate(savedInstanceState: Bundle?) {
-    Timber.i("PuppyCounter - ShareActivity - onCreate()")
-    super.onCreate(savedInstanceState)
-    setContentView(R.layout.layout_share)
-    findViews()
-    setOnShareBtnClickListener()
-  }
-
-  override fun onResume() {
-    Timber.i("PuppyCounter - ShareActivity - onResume()")
-    super.onResume()
-    renderDogCount(dogCount)
-  }
-
-  override fun onPause() {
-    Timber.i("PuppyCounter - ShareActivity - onPause()")
-    super.onPause()
-  }
-
-  override fun onStop() {
-    Timber.i("PuppyCounter - ShareActivity - onStop()")
-    super.onStop()
-  }
-
-  override fun onDestroy() {
-    Timber.i("PuppyCounter - ShareActivity - onDestroy()")
-    super.onDestroy()
-  }
-
-  private fun findViews() {
-    smallDogStatsLabel = findViewById(R.id.smallDogStats)
-    middleDogStatsLabel = findViewById(R.id.middleDogStats)
-    bigDogStatsLabel = findViewById(R.id.bigDogStats)
-  }
-
-  private fun setOnShareBtnClickListener() {
-    findViewById<Button>(R.id.shareBtn).setOnClickListener {
-      openShareDialog()
+        fun createIntent(context: Context) = Intent(context, ShareActivity::class.java)
     }
-  }
 
-  private fun renderDogCount(dogCount: DogCount) = with(dogCount) {
-    smallDogStatsLabel.text = getString(R.string.small_dog_stats, smallDogCount.toString())
-    middleDogStatsLabel.text = getString(R.string.middle_dog_stats, middleDogCount.toString())
-    bigDogStatsLabel.text = getString(R.string.big_dog_stats, bigDogCount.toString())
-  }
+    private lateinit var smallDogStatsLabel: TextView
+    private lateinit var middleDogStatsLabel: TextView
+    private lateinit var bigDogStatsLabel: TextView
 
-  private fun openShareDialog() {
-    AlertDialog.Builder(this)
-        .setTitle(R.string.share_dialog_title)
-        .setPositiveButton(R.string.share_dialog_yes) { dialog, _ ->
-          dialog.dismiss()
-          Toast.makeText(this, R.string.puppies_happy, Toast.LENGTH_SHORT).show()
+    private var dogCount: DogCount = DogCount()
+
+    override fun onStart() {
+        Timber.i("PuppyCounter - ShareActivity - onStart()")
+        super.onStart()
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        Timber.i("PuppyCounter - ShareActivity - onCreate()")
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.layout_share)
+        findViews()
+
+        // Read extra data from the Intent
+        readExtras()
+
+        setOnShareBtnClickListener()
+    }
+
+    override fun onResume() {
+        Timber.i("PuppyCounter - ShareActivity - onResume()")
+        super.onResume()
+        renderDogCount(dogCount)
+    }
+
+    override fun onPause() {
+        Timber.i("PuppyCounter - ShareActivity - onPause()")
+        super.onPause()
+    }
+
+    override fun onStop() {
+        Timber.i("PuppyCounter - ShareActivity - onStop()")
+        super.onStop()
+    }
+
+    override fun onDestroy() {
+        Timber.i("PuppyCounter - ShareActivity - onDestroy()")
+        super.onDestroy()
+    }
+
+    private fun findViews() {
+        smallDogStatsLabel = findViewById(R.id.smallDogStats)
+        middleDogStatsLabel = findViewById(R.id.middleDogStats)
+        bigDogStatsLabel = findViewById(R.id.bigDogStats)
+    }
+
+    private fun setOnShareBtnClickListener() {
+        findViewById<Button>(R.id.shareBtn).setOnClickListener {
+            openShareDialog()
         }
-        .setNegativeButton(R.string.share_dialog_no) { dialog, _ ->
-          dialog.dismiss()
-          Toast.makeText(this, R.string.puppies_sad, Toast.LENGTH_SHORT).show()
-        }
-        .show()
-  }
+    }
+
+    private fun renderDogCount(dogCount: DogCount) = with(dogCount) {
+        smallDogStatsLabel.text = getString(R.string.small_dog_stats, smallDogCount.toString())
+        middleDogStatsLabel.text = getString(R.string.middle_dog_stats, middleDogCount.toString())
+        bigDogStatsLabel.text = getString(R.string.big_dog_stats, bigDogCount.toString())
+    }
+
+    private fun openShareDialog() {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.share_dialog_title)
+            .setPositiveButton(R.string.share_dialog_yes) { dialog, _ ->
+                dialog.dismiss()
+                Toast.makeText(this, R.string.puppies_happy, Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton(R.string.share_dialog_no) { dialog, _ ->
+                dialog.dismiss()
+                Toast.makeText(this, R.string.puppies_sad, Toast.LENGTH_SHORT).show()
+            }
+            .show()
+    }
+
+    private fun readExtras() = intent.extras?.run {
+        Timber.i("PuppyCounter - ShareActivity - readExtras()")
+        dogCount = getParcelable(EXTRA_DOG_COUNT) ?: DogCount()
+    }
 }
