@@ -50,21 +50,21 @@ import com.raywenderlich.android.puppycounter.fragments.ActivityWithFragments
 
 class SplashActivity : AppCompatActivity() {
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_splash)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_splash)
 
-    // Show Main Activity after one second
-    Handler(Looper.myLooper()!!).postDelayed(
-        {
-          startFirstActivity()
-          finish()
-        },
-        1000L
-    )
-  }
+        // Show Main Activity after one second
+        Handler(Looper.myLooper()!!).postDelayed(
+            {
+                startFirstActivity()
+                finish()
+            },
+            1000L
+        )
+    }
 
-  private fun startFirstActivity() {
-    startActivity(Intent(this, MainActivity::class.java))
-  }
+    private fun startFirstActivity() {
+        startActivity(Intent(this, ActivityWithFragments::class.java))
+    }
 }
